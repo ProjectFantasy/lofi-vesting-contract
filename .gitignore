@@ -1,0 +1,10 @@
+node_modules/
+.env
+build/
+note.*.txt
+extract_abi.js
+test.sh
+.vscode/
+*.note
+.DS_Store
+abis/
