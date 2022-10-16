@@ -1,0 +1,38 @@
+{
+  "name": "fantasy-contracts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SFzxc/fantasy-contracts.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SFzxc/fantasy-contracts/issues"
+  },
+  "homepage": "https://github.com/SFzxc/fantasy-contracts#readme",
+  "devDependencies": {
+    "caver-js": "^1.6.3",
+    "dotenv": "^10.0.0",
+    "prettier": "^2.3.2",
+    "prettier-plugin-solidity": "*",
+    "truffle-plugin-verify": "^0.5.16"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.7.3",
+    "@truffle/hdwallet-provider": "^2.0.3",
+    "chai": "^4.3.4",
+    "chai-bignumber": "^3.0.0",
+    "ethereumjs-abi": "^0.6.8",
+    "ethereumjs-util": "^7.1.4",
+    "moment": "^2.29.4",
+    "openzeppelin-test-helpers": "^0.5.1",
+    "scrypt": "github:barrysteyn/node-scrypt#fb60a8d3c158fe115a624b5ffa7480f3a24b03fb",
+    "truffle-assertions": "^0.9.2"
+  }
+}
