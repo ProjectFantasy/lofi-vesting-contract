@@ -70,8 +70,12 @@ contract Vesting is Ownable {
         return _stages.length;
     }
 
-    function startVesting() public onlyOwner {
+    function startVesting() public onlyOwner onlyPreparedStage {
         _isPreparedStage = false;
+    }
+
+    function updateBeneficiary(address newBeneficiary) public onlyOwner onlyPreparedStage {
+        _beneficiary = newBeneficiary;
     }
 
     function release() external onlyBeneficiary {
