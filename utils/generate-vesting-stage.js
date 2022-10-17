@@ -18,12 +18,6 @@ async function generateMonthlyVestingStages(totalAmount, times, initStartVesting
     }
     vestingTimes.push(vestingTime)
     vestingAmounts.push(vestingAmount)
-
-    // vestLogs.push({
-    //   time: moment.unix(vestingTime).format('DD-MM-YYYY HH:mm:ss'),
-    //   timestamp: vestingTime.toString(),
-    //   amount: web3.utils.fromWei(vestingAmount, 'ether'),
-    // })
   }
   return { vestingTimes, vestingAmounts }
 }
