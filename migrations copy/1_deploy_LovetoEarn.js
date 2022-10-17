@@ -17,5 +17,4 @@ module.exports = async (deployer, network) => {
   await deployer.deploy(Vesting, beneficiary, vestingTokenAddr, totalAmount)
   const vestingContract = await Vesting.deployed()
   await vestingContract.pushStages(vestingTimes, vestingAmounts)
-  await vestingContract.startVesting({ from: deployer })
 }
