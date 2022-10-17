@@ -109,14 +109,16 @@ contract Vesting is Ownable {
         sendToken(availableAmount);
     }
 
-    function getAvailableAmount() public view returns (uint256 availableAmount) {
+    function getAvailableAmount() public view returns (uint256) {
+        uint256 availableAmount = 0;
         for (uint256 i = 0; i < _stages.length; i++) {
             if (block.timestamp >= _stages[i].releaseTime) {
                 availableAmount = availableAmount.add(_stages[i].amount);
             }
         }
 
-        return availableAmount.sub(_sentAmount);
+        availableAmount = availableAmount.sub(_sentAmount);
+        return availableAmount;
     }
 
     function sendToken(uint256 _amount) internal {
