@@ -1,14 +1,14 @@
-const generateMonthlyVestingStages = require('../utils/generate-vesting-stage')
+const { generateMonthlyVestingStagesInWei } = require('../utils/generate-vesting-stage')
 const { BN } = require('openzeppelin-test-helpers')
 const Vesting = artifacts.require('Vesting')
 const vestingTokenAddr = process.env.VESTING_TOKEN
-const beneficiary = '0x2513eDc56a2D0fB99668A0E755F355852c18F87b'
+const beneficiary = '0x2502156C21df7A51f0254f685547Af297E182411'
 module.exports = async (deployer, network) => {
   if (network == 'develop') return
 
-  const totalAmount = new BN(220000000)
-  const times = new BN(5 * 12)
-  const { vestingTimes, vestingAmounts } = await generateMonthlyVestingStages(
+  const totalAmount = new BN(50000000)
+  const times = new BN(7 * 12)
+  const { vestingTimes, vestingAmounts } = await generateMonthlyVestingStagesInWei(
     totalAmount,
     times,
     new BN(Math.floor(Date.now() / 1000))
@@ -17,5 +17,4 @@ module.exports = async (deployer, network) => {
   await deployer.deploy(Vesting, beneficiary, vestingTokenAddr, totalAmount)
   const vestingContract = await Vesting.deployed()
   await vestingContract.pushStages(vestingTimes, vestingAmounts)
-  await vestingContract.startVesting({ from: deployer })
 }

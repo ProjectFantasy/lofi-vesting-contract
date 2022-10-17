@@ -1,35 +1,28 @@
 const { expect } = require('chai')
-const moment = require('moment')
 const { constants, time, BN, expectEvent, expectRevert } = require('openzeppelin-test-helpers')
-var ethUtils = require('ethereumjs-util')
-const truffleAssertions = require('truffle-assertions')
-const { web3 } = require('openzeppelin-test-helpers/src/setup')
-const generateMonthlyVestingStages = require('../utils/generate-vesting-stage')
-const { ZERO_ADDRESS } = constants
-
+// const { web3 } = require('openzeppelin-test-helpers/src/setup')
+const { generateMonthlyVestingStagesInWei } = require('../utils/generate-vesting-stage')
 const Token20 = artifacts.require('mocks/Token20')
 const Vesting = artifacts.require('Vesting')
 
-contract('Stake', ([deployer, owner, feeWallet, beneficiary, buyer2]) => {
+contract('Vesting', ([deployer, beneficiary]) => {
   let vesting, token
 
   before(async () => {
-    await time.advanceBlock()
+    // await time.advanceBlock()
   })
   beforeEach('Deploy contracts', async () => {
     token = await Token20.new('TestToken', 'TToken', 18, web3.utils.toWei('1000000000', 'ether'), { from: deployer })
     vesting = await Vesting.new(beneficiary, token.address, web3.utils.toWei('300000000', 'ether'), { from: deployer })
-
     await token.transfer(vesting.address, web3.utils.toWei('300000000', 'ether'), { from: deployer })
   })
 
   doVesting = async (totalAmount, times) => {
-    const { vestingTimes, vestingAmounts } = await generateMonthlyVestingStages(
+    const { vestingTimes, vestingAmounts } = await generateMonthlyVestingStagesInWei(
       totalAmount,
       times,
       (await time.latest()).add(time.duration.seconds(100))
     )
-
     await vesting.pushStages(vestingTimes, vestingAmounts, { from: deployer })
     const stages = await vesting.getStages({ from: deployer })
     for (let i = 0; i < stages.length; i++) {
@@ -49,7 +42,6 @@ contract('Stake', ([deployer, owner, feeWallet, beneficiary, buyer2]) => {
       accBalance = accBalance.add(amount)
       expect(new BN(balance)).to.be.bignumber.equal(accBalance)
     }
-
     expect(accBalance).to.be.bignumber.equal(web3.utils.toWei(totalAmount, 'ether'))
     const remainingAmount = await vesting.getAvailableAmount()
     expect(new BN(remainingAmount)).to.be.bignumber.equal(new BN(0))
@@ -61,24 +53,18 @@ contract('Stake', ([deployer, owner, feeWallet, beneficiary, buyer2]) => {
       for (let i = 0; i < 10; i++) {
         const vestingTime = (await time.latest()).add(time.duration.seconds((i + 1) * 100))
         const vestingAmount = 100
-
         vestingTimes.push(vestingTime)
         vestingAmounts.push(vestingAmount)
       }
-
       await vesting.pushStages(vestingTimes, vestingAmounts, { from: deployer })
-
       const stages = await vesting.getStages({ from: deployer })
       for (let i = 0; i < stages.length; i++) {
         const vestingTime = stages[i].releaseTime
         const amount = stages[i].amount
-
         expect(new BN(vestingTime)).to.be.bignumber.equal(vestingTimes[i])
         expect(new BN(amount)).to.be.bignumber.equal(new BN(vestingAmounts[i]))
       }
-
       await vesting.startVesting({ from: deployer })
-
       let accBalance = 0
       for (let i = 0; i < vestingTimes.length; i++) {
         const vestingTime = vestingTimes[i]
@@ -95,6 +81,7 @@ contract('Stake', ([deployer, owner, feeWallet, beneficiary, buyer2]) => {
 
     it('test LovetoEarn Vesting', async () => {
       const totalAmount = new BN(300000000)
+
       const times = new BN(7 * 12)
 
       await doVesting(totalAmount, times)
@@ -174,6 +161,27 @@ contract('Stake', ([deployer, owner, feeWallet, beneficiary, buyer2]) => {
       }
       const remainingAmount = await vesting.getAvailableAmount()
       expect(new BN(remainingAmount)).to.be.bignumber.equal(new BN(0))
+    })
+    it('should be revert if there is not enought balance when starting vesting', async () => {
+      await vesting.setTotalAmount(web3.utils.toWei('400000000', 'ether'))
+      const vestingTimes = []
+      const vestingAmounts = []
+      for (let i = 0; i < 10; i++) {
+        const vestingTime = (await time.latest()).add(time.duration.seconds((i + 1) * 100))
+        const vestingAmount = 100
+        vestingTimes.push(vestingTime)
+        vestingAmounts.push(vestingAmount)
+      }
+      await vesting.pushStages(vestingTimes, vestingAmounts, { from: deployer })
+      const stages = await vesting.getStages({ from: deployer })
+      for (let i = 0; i < stages.length; i++) {
+        const vestingTime = stages[i].releaseTime
+        const amount = stages[i].amount
+        expect(new BN(vestingTime)).to.be.bignumber.equal(vestingTimes[i])
+        expect(new BN(amount)).to.be.bignumber.equal(new BN(vestingAmounts[i]))
+      }
+
+      await expectRevert(vesting.startVesting({ from: deployer }), 'Not enough balance')
     })
   })
 })

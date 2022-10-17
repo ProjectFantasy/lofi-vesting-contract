@@ -21,7 +21,7 @@
     "dotenv": "^10.0.0",
     "prettier": "^2.3.2",
     "prettier-plugin-solidity": "*",
-    "truffle-plugin-verify": "^0.5.16"
+    "truffle-plugin-verify": "^0.5.31"
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.7.3",

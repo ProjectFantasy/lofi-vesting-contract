@@ -22,15 +22,17 @@ contract Vesting is Ownable {
 
     event TokenSent(uint256 amount, uint256 timestamp);
     event Staged(uint256[] timestamps, uint256[] amounts);
+    event Beneficiary(address beneficiary);
+    event TotalAmountChanged(uint256 totalAmount);
 
     constructor(
-        address beneficiary,
-        address token,
-        uint256 totalAmount
+        address initBeneficiary,
+        address initToken,
+        uint256 initTotalAmount
     ) Ownable() {
-        _token = IERC20(token);
-        _beneficiary = beneficiary;
-        _totalAmount = totalAmount;
+        _token = IERC20(initToken);
+        _beneficiary = initBeneficiary;
+        _totalAmount = initTotalAmount;
     }
 
     modifier onlyBeneficiary() {
@@ -41,6 +43,23 @@ contract Vesting is Ownable {
     modifier onlyPreparedStage() {
         require(_isPreparedStage, 'not is prepare stage');
         _;
+    }
+
+    function setTotalAmount(uint256 newTotalAmount) public {
+        _totalAmount = newTotalAmount;
+        emit TotalAmountChanged(_totalAmount);
+    }
+
+    function totalAmount() public view returns (uint256) {
+        return _totalAmount;
+    }
+
+    function updateToken(address newToken) public {
+        _token = IERC20(newToken);
+    }
+
+    function token() public view returns (address) {
+        return address(_token);
     }
 
     function pushStages(uint256[] calldata timestamps, uint256[] calldata amounts) public onlyOwner onlyPreparedStage {
@@ -71,11 +90,17 @@ contract Vesting is Ownable {
     }
 
     function startVesting() public onlyOwner onlyPreparedStage {
+        require(_token.balanceOf(address(this)) >= _totalAmount, 'Not enough balance');
         _isPreparedStage = false;
     }
 
     function updateBeneficiary(address newBeneficiary) public onlyOwner onlyPreparedStage {
         _beneficiary = newBeneficiary;
+        emit Beneficiary(_beneficiary);
+    }
+
+    function beneficiary() public view returns (address) {
+        return _beneficiary;
     }
 
     function release() external onlyBeneficiary {
@@ -84,14 +109,16 @@ contract Vesting is Ownable {
         sendToken(availableAmount);
     }
 
-    function getAvailableAmount() public view returns (uint256 availableAmount) {
+    function getAvailableAmount() public view returns (uint256) {
+        uint256 availableAmount = 0;
         for (uint256 i = 0; i < _stages.length; i++) {
             if (block.timestamp >= _stages[i].releaseTime) {
                 availableAmount = availableAmount.add(_stages[i].amount);
             }
         }
 
-        return availableAmount.sub(_sentAmount);
+        availableAmount = availableAmount.sub(_sentAmount);
+        return availableAmount;
     }
 
     function sendToken(uint256 _amount) internal {
