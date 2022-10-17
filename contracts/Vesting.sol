@@ -27,12 +27,12 @@ contract Vesting is Ownable {
 
     constructor(
         address initBeneficiary,
-        address token,
-        uint256 totalAmount
+        address initToken,
+        uint256 initTotalAmount
     ) Ownable() {
-        _token = IERC20(token);
+        _token = IERC20(initToken);
         _beneficiary = initBeneficiary;
-        _totalAmount = totalAmount;
+        _totalAmount = initTotalAmount;
     }
 
     modifier onlyBeneficiary() {
