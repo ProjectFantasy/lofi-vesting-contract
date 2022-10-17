@@ -11,12 +11,7 @@ async function generateMonthlyVestingStages(totalAmount, times, initStartVesting
   const startVestingTime = new BN(initStartVestingTime)
 
   for (let i = 0; i < times; i++) {
-    const vestingTime = new BN(
-      moment
-        .unix(startVestingTime)
-        .add(i + 1, 'month')
-        .unix()
-    )
+    const vestingTime = new BN(moment.unix(startVestingTime).add(i, 'month').unix())
     let vestingAmount = amountEachTime
     if (i == times - 1) {
       vestingAmount = lastAmount
