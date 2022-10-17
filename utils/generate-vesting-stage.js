@@ -17,7 +17,6 @@ async function generateMonthlyVestingStages(totalAmount, times, initStartVesting
         .add(i + 1, 'month')
         .unix()
     )
-    // let vestingAmount = web3.utils.toWei(amountEachTime, 'ether') amountEachTime.mul(ethPow)
     let vestingAmount = amountEachTime
     if (i == times - 1) {
       vestingAmount = lastAmount
@@ -39,5 +38,5 @@ async function generateMonthlyVestingStagesInWei(totalAmount, times, initStartVe
 
   return { vestingTimes, vestingAmounts: vestingAmounts.map((v) => v.mul(new BN('1000000000000000000'))) }
 }
-// module.exports = generateMonthlyVestingStages
+
 module.exports = { generateMonthlyVestingStages, generateMonthlyVestingStagesInWei }

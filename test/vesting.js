@@ -1,7 +1,7 @@
 const { expect } = require('chai')
 const { constants, time, BN, expectEvent, expectRevert } = require('openzeppelin-test-helpers')
 // const { web3 } = require('openzeppelin-test-helpers/src/setup')
-const { generateMonthlyVestingStages, generateMonthlyVestingStagesInWei } = require('../utils/generate-vesting-stage')
+const { generateMonthlyVestingStagesInWei } = require('../utils/generate-vesting-stage')
 const Token20 = artifacts.require('mocks/Token20')
 const Vesting = artifacts.require('Vesting')
 
@@ -23,23 +23,19 @@ contract('Vesting', ([deployer, beneficiary]) => {
       times,
       (await time.latest()).add(time.duration.seconds(100))
     )
-
-    // const weiVestingAmounts = vestingAmounts.map((v) => web3.utils.toWei(v, 'ether'))
-    const weiVestingAmounts = vestingAmounts
-
-    await vesting.pushStages(vestingTimes, weiVestingAmounts, { from: deployer })
+    await vesting.pushStages(vestingTimes, vestingAmounts, { from: deployer })
     const stages = await vesting.getStages({ from: deployer })
     for (let i = 0; i < stages.length; i++) {
       const vestingTime = stages[i].releaseTime
       const amount = stages[i].amount
       expect(new BN(vestingTime)).to.be.bignumber.equal(vestingTimes[i])
-      expect(new BN(amount)).to.be.bignumber.equal(new BN(weiVestingAmounts[i]))
+      expect(new BN(amount)).to.be.bignumber.equal(new BN(vestingAmounts[i]))
     }
     await vesting.startVesting({ from: deployer })
     let accBalance = new BN(0)
     for (let i = 0; i < vestingTimes.length; i++) {
       const vestingTime = vestingTimes[i]
-      const amount = weiVestingAmounts[i]
+      const amount = vestingAmounts[i]
       await time.increaseTo(vestingTime)
       await vesting.release({ from: beneficiary })
       const balance = await token.balanceOf(beneficiary)
@@ -91,101 +87,101 @@ contract('Vesting', ([deployer, beneficiary]) => {
       await doVesting(totalAmount, times)
     })
 
-    // it('test Marketing Vesting', async () => {
-    //   const totalAmount = new BN(280000000)
-    //   const times = new BN(7 * 12)
+    it('test Marketing Vesting', async () => {
+      const totalAmount = new BN(280000000)
+      const times = new BN(7 * 12)
 
-    //   await doVesting(totalAmount, times)
-    // })
+      await doVesting(totalAmount, times)
+    })
 
-    // it('test Sale Vesting', async () => {
-    //   const totalAmount = new BN(100000000)
-    //   const times = new BN(1 * 12)
-    //   await doVesting(totalAmount, times)
-    // })
+    it('test Sale Vesting', async () => {
+      const totalAmount = new BN(100000000)
+      const times = new BN(1 * 12)
+      await doVesting(totalAmount, times)
+    })
 
-    // it('test Team Vesting', async () => {
-    //   const totalAmount = new BN(220000000)
-    //   const times = new BN(5 * 12)
-    //   await doVesting(totalAmount, times)
-    // })
+    it('test Team Vesting', async () => {
+      const totalAmount = new BN(220000000)
+      const times = new BN(5 * 12)
+      await doVesting(totalAmount, times)
+    })
 
-    // it('test Advisor Vesting', async () => {
-    //   const totalAmount = new BN(50000000)
-    //   const times = new BN(3 * 12)
-    //   await doVesting(totalAmount, times)
-    // })
+    it('test Advisor Vesting', async () => {
+      const totalAmount = new BN(50000000)
+      const times = new BN(3 * 12)
+      await doVesting(totalAmount, times)
+    })
 
-    // it('test Reserve Vesting', async () => {
-    //   const totalAmount = new BN(50000000)
-    //   const times = new BN(7 * 12)
-    //   await doVesting(totalAmount, times)
-    // })
+    it('test Reserve Vesting', async () => {
+      const totalAmount = new BN(50000000)
+      const times = new BN(7 * 12)
+      await doVesting(totalAmount, times)
+    })
 
-    // it('test reset stages', async () => {
-    //   const vestingTimes = []
-    //   const vestingAmounts = []
-    //   for (let i = 0; i < 10; i++) {
-    //     const vestingTime = (await time.latest()).add(time.duration.seconds((i + 1) * 100))
-    //     const vestingAmount = 100
+    it('test reset stages', async () => {
+      const vestingTimes = []
+      const vestingAmounts = []
+      for (let i = 0; i < 10; i++) {
+        const vestingTime = (await time.latest()).add(time.duration.seconds((i + 1) * 100))
+        const vestingAmount = 100
 
-    //     vestingTimes.push(vestingTime)
-    //     vestingAmounts.push(vestingAmount)
-    //   }
+        vestingTimes.push(vestingTime)
+        vestingAmounts.push(vestingAmount)
+      }
 
-    //   await vesting.pushStages(vestingTimes, vestingAmounts, { from: deployer })
+      await vesting.pushStages(vestingTimes, vestingAmounts, { from: deployer })
 
-    //   let stages = await vesting.getStages({ from: deployer })
-    //   for (let i = 0; i < stages.length; i++) {
-    //     const vestingTime = stages[i].releaseTime
-    //     const amount = stages[i].amount
+      let stages = await vesting.getStages({ from: deployer })
+      for (let i = 0; i < stages.length; i++) {
+        const vestingTime = stages[i].releaseTime
+        const amount = stages[i].amount
 
-    //     expect(new BN(vestingTime)).to.be.bignumber.equal(vestingTimes[i])
-    //     expect(new BN(amount)).to.be.bignumber.equal(new BN(vestingAmounts[i]))
-    //   }
+        expect(new BN(vestingTime)).to.be.bignumber.equal(vestingTimes[i])
+        expect(new BN(amount)).to.be.bignumber.equal(new BN(vestingAmounts[i]))
+      }
 
-    //   await vesting.resetStages({ from: deployer })
+      await vesting.resetStages({ from: deployer })
 
-    //   stages = await vesting.getStages({ from: deployer })
+      stages = await vesting.getStages({ from: deployer })
 
-    //   expect(stages.length).equal(0)
-    //   await vesting.pushStages(vestingTimes, vestingAmounts, { from: deployer })
+      expect(stages.length).equal(0)
+      await vesting.pushStages(vestingTimes, vestingAmounts, { from: deployer })
 
-    //   await vesting.startVesting({ from: deployer })
+      await vesting.startVesting({ from: deployer })
 
-    //   let accBalance = 0
-    //   for (let i = 0; i < vestingTimes.length; i++) {
-    //     const vestingTime = vestingTimes[i]
-    //     const amount = vestingAmounts[i]
-    //     await time.increaseTo(vestingTime)
-    //     await vesting.release({ from: beneficiary })
-    //     const balance = await token.balanceOf(beneficiary)
-    //     accBalance += amount
-    //     expect(new BN(balance)).to.be.bignumber.equal(new BN(accBalance))
-    //   }
-    //   const remainingAmount = await vesting.getAvailableAmount()
-    //   expect(new BN(remainingAmount)).to.be.bignumber.equal(new BN(0))
-    // })
-    // it('should be revert if there is not enought balance when starting vesting', async () => {
-    //   await vesting.setTotalAmount(web3.utils.toWei('400000000', 'ether'))
-    //   const vestingTimes = []
-    //   const vestingAmounts = []
-    //   for (let i = 0; i < 10; i++) {
-    //     const vestingTime = (await time.latest()).add(time.duration.seconds((i + 1) * 100))
-    //     const vestingAmount = 100
-    //     vestingTimes.push(vestingTime)
-    //     vestingAmounts.push(vestingAmount)
-    //   }
-    //   await vesting.pushStages(vestingTimes, vestingAmounts, { from: deployer })
-    //   const stages = await vesting.getStages({ from: deployer })
-    //   for (let i = 0; i < stages.length; i++) {
-    //     const vestingTime = stages[i].releaseTime
-    //     const amount = stages[i].amount
-    //     expect(new BN(vestingTime)).to.be.bignumber.equal(vestingTimes[i])
-    //     expect(new BN(amount)).to.be.bignumber.equal(new BN(vestingAmounts[i]))
-    //   }
+      let accBalance = 0
+      for (let i = 0; i < vestingTimes.length; i++) {
+        const vestingTime = vestingTimes[i]
+        const amount = vestingAmounts[i]
+        await time.increaseTo(vestingTime)
+        await vesting.release({ from: beneficiary })
+        const balance = await token.balanceOf(beneficiary)
+        accBalance += amount
+        expect(new BN(balance)).to.be.bignumber.equal(new BN(accBalance))
+      }
+      const remainingAmount = await vesting.getAvailableAmount()
+      expect(new BN(remainingAmount)).to.be.bignumber.equal(new BN(0))
+    })
+    it('should be revert if there is not enought balance when starting vesting', async () => {
+      await vesting.setTotalAmount(web3.utils.toWei('400000000', 'ether'))
+      const vestingTimes = []
+      const vestingAmounts = []
+      for (let i = 0; i < 10; i++) {
+        const vestingTime = (await time.latest()).add(time.duration.seconds((i + 1) * 100))
+        const vestingAmount = 100
+        vestingTimes.push(vestingTime)
+        vestingAmounts.push(vestingAmount)
+      }
+      await vesting.pushStages(vestingTimes, vestingAmounts, { from: deployer })
+      const stages = await vesting.getStages({ from: deployer })
+      for (let i = 0; i < stages.length; i++) {
+        const vestingTime = stages[i].releaseTime
+        const amount = stages[i].amount
+        expect(new BN(vestingTime)).to.be.bignumber.equal(vestingTimes[i])
+        expect(new BN(amount)).to.be.bignumber.equal(new BN(vestingAmounts[i]))
+      }
 
-    //   await expectRevert(vesting.startVesting({ from: deployer }), 'Not enough balance')
-    // })
+      await expectRevert(vesting.startVesting({ from: deployer }), 'Not enough balance')
+    })
   })
 })
