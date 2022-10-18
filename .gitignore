@@ -1,7 +1,7 @@
 node_modules/
 .env
 build/
-note.*.txt
+notes/
 extract_abi.js
 test.sh
 .vscode/
