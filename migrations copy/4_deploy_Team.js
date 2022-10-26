@@ -6,7 +6,7 @@ const beneficiary = '0x2513eDc56a2D0fB99668A0E755F355852c18F87b'
 module.exports = async (deployer, network) => {
   if (network == 'develop') return
 
-  const totalAmount = new BN(220000000)
+  const totalAmount = new BN(170000000)
   const times = new BN(5 * 12)
   const { vestingTimes, vestingAmounts } = await generateMonthlyVestingStagesInWei(
     totalAmount,

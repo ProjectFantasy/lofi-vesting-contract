@@ -41,9 +41,8 @@ const generateStages = (totalAmount, times, file) => {
     fs.writeFileSync(file, content)
   })
 }
-generateStages(new BN(300000000), new BN(7 * 12), './notes/love_2_earn.csv')
-generateStages(new BN(280000000), new BN(7 * 12), './notes/marketing.csv')
-generateStages(new BN(100000000), new BN(1 * 12), './notes/sale.csv')
-generateStages(new BN(220000000), new BN(5 * 12), './notes/team.csv')
-generateStages(new BN(50000000), new BN(3 * 12), './notes/advisor.csv')
+generateStages(new BN(380000000), new BN(7 * 12), './notes/love_2_earn.csv')
+generateStages(new BN(230000000), new BN(7 * 12), './notes/marketing.csv')
+generateStages(new BN(170000000), new BN(5 * 12), './notes/team.csv')
+generateStages(new BN(20000000), new BN(3 * 12), './notes/advisor.csv')
 generateStages(new BN(50000000), new BN(7 * 12), './notes/reserved.csv')
