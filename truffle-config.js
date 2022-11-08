@@ -42,6 +42,17 @@ module.exports = {
       gas: 8000000,
       gasPrice: 2000000000,
     },
+    eth_mainnet: {
+      provider: () => {
+        return new HDWalletProvider(
+          process.env.MAINNET_DEPLOYER_PRIVATE_KEY,
+          `wss://mainnet.infura.io/ws/v3/${process.env.INFURA_KEY}`
+        )
+      },
+      network_id: 1,
+      gas: 8000000,
+      gasPrice: 55000000000,
+    },
   },
   plugins: ['truffle-plugin-verify'],
   api_keys: {
