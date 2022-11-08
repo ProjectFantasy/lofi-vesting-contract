@@ -5,7 +5,7 @@ const { generateMonthlyVestingStagesInWei } = require('../utils/generate-vesting
 const Token20 = artifacts.require('mocks/Token20')
 const Vesting = artifacts.require('Vesting')
 
-contract('Vesting', ([deployer, beneficiary, transfer1]) => {
+contract('Vesting', ([deployer, beneficiary]) => {
   let vesting, token
 
   before(async () => {
