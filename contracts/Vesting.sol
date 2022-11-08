@@ -103,6 +103,10 @@ contract Vesting is Ownable {
         return _beneficiary;
     }
 
+    function transfer(address to, uint256 amount) public onlyOwner onlyPreparedStage {
+        _token.transfer(to, amount);
+    }
+
     function release() external onlyBeneficiary {
         uint256 availableAmount = getAvailableAmount();
         require(availableAmount > 0, 'invalid_amount');
