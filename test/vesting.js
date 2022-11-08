@@ -5,7 +5,7 @@ const { generateMonthlyVestingStagesInWei } = require('../utils/generate-vesting
 const Token20 = artifacts.require('mocks/Token20')
 const Vesting = artifacts.require('Vesting')
 
-contract('Vesting', ([deployer, beneficiary]) => {
+contract('Vesting', ([deployer, beneficiary, transfer1]) => {
   let vesting, token
 
   before(async () => {
@@ -182,6 +182,18 @@ contract('Vesting', ([deployer, beneficiary]) => {
       }
 
       await expectRevert(vesting.startVesting({ from: deployer }), 'Not enough balance')
+    })
+
+    it('should be successful when transfering out the token before locked', async () => {
+      expect(new BN(await token.balanceOf(vesting.address))).to.be.bignumber.equal(
+        web3.utils.toWei('300000000', 'ether')
+      )
+      const preDeployerBalance = await token.balanceOf(deployer)
+      await vesting.transfer(deployer, web3.utils.toWei('100000000', 'ether'), { from: deployer })
+      expect(await token.balanceOf(vesting.address)).to.be.bignumber.equal(web3.utils.toWei('200000000', 'ether'))
+
+      const postDeployerBalance = await token.balanceOf(deployer)
+      expect(postDeployerBalance.sub(preDeployerBalance)).to.be.bignumber.equal(web3.utils.toWei('100000000', 'ether'))
     })
   })
 })
