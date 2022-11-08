@@ -12,6 +12,14 @@ module.exports = {
       port: 8545, // Standard Ethereum port (default: none)
       network_id: '*', // Any network (default: none),
     },
+    goerli: {
+      provider: () =>
+        new HDWalletProvider({
+          privateKeys: [process.env.TESTNET_DEPLOYER_PRIVATE_KEY],
+          providerOrUrl: `https://rpc.ankr.com/eth_goerli`,
+        }),
+      network_id: 5,
+    },
     bsc_testnet: {
       provider: () => {
         return new HDWalletProvider({
@@ -23,22 +31,33 @@ module.exports = {
       gas: 8000000,
       gasPrice: 25000000000,
     },
-
-    bsc_mainnet: {
+    polygon_testnet: {
       provider: () => {
         return new HDWalletProvider({
-          privateKeys: [process.env.MAINNET_DEPLOYER_PRIVATE_KEY],
-          providerOrUrl: `https://speedy-nodes-nyc.moralis.io/880a370e3e7e01538eaef7d3/bsc/mainnet`,
+          privateKeys: [process.env.TESTNET_DEPLOYER_PRIVATE_KEY],
+          providerOrUrl: `https://rpc-mumbai.matic.today`,
         })
       },
-      network_id: 56,
+      network_id: 80001,
       gas: 8000000,
-      gasPrice: 6000000000,
+      gasPrice: 2000000000,
+    },
+    eth_mainnet: {
+      provider: () => {
+        return new HDWalletProvider(
+          process.env.MAINNET_DEPLOYER_PRIVATE_KEY,
+          `wss://mainnet.infura.io/ws/v3/${process.env.INFURA_KEY}`
+        )
+      },
+      network_id: 1,
+      gas: 8000000,
+      gasPrice: 17000000000,
     },
   },
   plugins: ['truffle-plugin-verify'],
   api_keys: {
-    bscscan: process.env.ETHERSCAN_API_KEY,
+    // bscscan: process.env.ETHERSCAN_API_KEY,
+    etherscan: process.env.ETHERSCAN_API_KEY,
   },
   // Configure your compilers
   compilers: {
